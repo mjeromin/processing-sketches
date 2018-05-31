@@ -1,5 +1,5 @@
 """
- * Pittsburgh night
+ * Pittsburgh Night
 """
 
 offset = 0
@@ -18,11 +18,12 @@ def setup():
     #print PFont.list();
 
     fonts = {}
-    # Download this font and put it in your sketch directory or your ~/.fonts/
-    # https://www.dafont.com/monofur.font 
-    # Create the font for the menu console
+    # Download these font packs and put them in your sketch directory or your ~/.fonts/
+    # https://www.dafont.com/monofur.font
+    # https://www.dafont.com/hamburger-heaven.font
+    # Create the fonts for the coordinates and title
     fonts['coords'] = createFont("monofur", 12)
-    fonts['title'] = createFont("monofur", 36)
+    fonts['title'] = createFont("HamburgerHeaven", 42)
         
     # Initialize state of lights
     # random count and placement along building #1
@@ -38,15 +39,15 @@ def setup():
                      "image": loadImage("./images/light1.png")
                 }
         town_lights.append(light)
-    
+
 def draw_coords(x, y):
     textFont(fonts['coords'])
     fill(255, 255, 255)
     text("({}, {})".format(str(x),str(y)), 10, 10)
-    
+
 def draw_title(x, y):
     textFont(fonts['title'])
-    fill(255, 255, 255)
+    fill(240, 174, 0)
     text("Pittsburgh", x, y)
 
 def update_town_lights():
@@ -67,7 +68,7 @@ def draw_town_lights():
     for light in town_lights:
         if light['state']:
             image(light['image'], light['x'], light['y'])
-                                   
+
 def draw():
     global offset
     background(0)
@@ -76,11 +77,11 @@ def draw():
     # Update the town lights
     update_town_lights()
     
-    # Print coordinates
-    draw_coords(mouseX, mouseY)
-    
     # Display town lights (if ON)
     draw_town_lights()
-    
+
+    # Print coordinates
+    draw_coords(mouseX, mouseY)
+
     # Display the title
     draw_title(2*width/5, 40)
