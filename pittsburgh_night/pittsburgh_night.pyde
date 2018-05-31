@@ -10,6 +10,7 @@ def setup():
     global img_pittsburgh_night
     global fonts
     global town_lights
+    global moon
     
     # load image of downtown Pittsburgh at night (phone camera)
     img_pittsburgh_night = loadImage("./images/pittsburgh_night.png")
@@ -40,6 +41,12 @@ def setup():
                 }
         town_lights.append(light)
 
+    # initialize our moon position
+    moon = { 'x': 700, 'y': 70,
+             'x-direction': 1, 'y-direction': 1,
+             'x-speed': 0.3, 'y-speed': 0.2
+           }
+
 def draw_coords(x, y):
     textFont(fonts['coords'])
     fill(255, 255, 255)
@@ -69,6 +76,28 @@ def draw_town_lights():
         if light['state']:
             image(light['image'], light['x'], light['y'])
 
+def draw_moon():
+    """Calculate position of moon and draw it. """
+
+    fill(255, 255, 255)
+
+    # reset our x-position if we reach the end of the display
+    if moon['x'] >= width and moon['x-direction'] > 0:
+        moon['x'] = 0
+    elif moon['x'] <= 0 and moon['x-direction'] < 0:
+        moon['y'] = width
+
+    # reset our y-position if we reach the end of the display
+    if moon['y'] >= height and moon['y-direction'] > 0:
+        moon['y'] = 0
+    elif moon['y'] <= 0 and moon['y-direction'] < 0:
+        moon['y'] = height
+
+    moon['x'] += moon['x-direction'] * moon['x-speed']
+    moon['y'] += moon['y-direction'] * moon['y-speed']
+    ellipse(int(moon['x']), int(moon['y']), 55, 55)
+
+
 def draw():
     global offset
     background(0)
@@ -85,3 +114,6 @@ def draw():
 
     # Display the title
     draw_title(2*width/5, 40)
+
+    # Display the moon
+    draw_moon()
