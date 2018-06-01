@@ -7,13 +7,14 @@ easing = 0.05
 
 def setup():
     size(1024, 444)
-    global img_pittsburgh_night
+    global images
     global fonts
     global town_lights
     global moon
     
     # load image of downtown Pittsburgh at night (phone camera)
-    img_pittsburgh_night = loadImage("./images/pittsburgh_night.png")
+    images = {}
+    images['skyline'] = loadImage("./images/pittsburgh_night.png")
 
     # Uncomment the following line to see the available fonts 
     #print PFont.list();
@@ -42,9 +43,9 @@ def setup():
         town_lights.append(light)
 
     # initialize our moon position
-    moon = { 'x': 700, 'y': 70,
+    moon = { 'x': 140, 'y': 84,
              'x-direction': 1, 'y-direction': 1,
-             'x-speed': 0.3, 'y-speed': 0.2
+             'x-speed': 0.3, 'y-speed': 0.0
            }
 
 def draw_coords(x, y):
@@ -101,7 +102,7 @@ def draw_moon():
 def draw():
     global offset
     background(0)
-    image(img_pittsburgh_night, 0, 0) # Display the viewport
+    image(images['skyline'], 0, 0) # Display the skyline
   
     # Update the town lights
     update_town_lights()
@@ -112,8 +113,11 @@ def draw():
     # Print coordinates
     draw_coords(mouseX, mouseY)
 
+    # Display the moon
+    draw_moon()
+
     # Display the title
     draw_title(2*width/5, 40)
 
-    # Display the moon
-    draw_moon()
+    # Display the cityscape (masking the moon)
+    #image(images['cityscape'], 0, 0)
