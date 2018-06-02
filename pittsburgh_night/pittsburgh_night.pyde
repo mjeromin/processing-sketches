@@ -5,7 +5,7 @@
 offset = 0
 easing = 0.05
 max_town_lights = 20
-max_cloud_count = 45
+max_cloud_count = 100
 min_cloud_puff_count = 70
 max_cloud_puff_count = 150
 max_cloud_puff_diameter = 50
@@ -59,6 +59,7 @@ def cloud_init():
 
 def setup():
     size(1024, 444, P3D)
+    frameRate(60)
     global images
     global fonts
     global town_lights
@@ -189,3 +190,8 @@ def draw():
 
     # Display the title
     draw_title(2*width/5, 40)
+
+    # Output to frames (this could take a while).
+    # Then stitch them together using ffmpeg:
+    #     ffmpeg -r 60 -i frames/frame-%4d.png -pix_fmt yuv420p -r 60 frames/video.mp4
+    #saveFrame("frames/frame-####.png")
