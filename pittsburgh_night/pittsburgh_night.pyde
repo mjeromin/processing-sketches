@@ -2,8 +2,6 @@
  * Pittsburgh Night
 """
 
-offset = 0
-easing = 0.05
 max_town_lights = 20
 max_cloud_count = 100
 min_cloud_puff_count = 70
@@ -170,7 +168,6 @@ def draw_clouds():
         shape(cloud['shape'], cloud['x'], cloud['y'])
 
 def draw():
-    global offset
     background(0)
     image(images['skyline'], 0, 0) # Display the skyline
 
