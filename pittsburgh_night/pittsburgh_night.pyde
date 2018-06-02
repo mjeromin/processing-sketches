@@ -58,7 +58,7 @@ def cloud_init():
         clouds.append(cloud)
 
 def setup():
-    size(1024, 444)
+    size(1024, 444, P3D)
     global images
     global fonts
     global town_lights
