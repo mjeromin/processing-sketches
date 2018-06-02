@@ -60,6 +60,7 @@ def cloud_init():
 def setup():
     size(1024, 444, P3D)
     frameRate(60)
+    noCursor()
     global images
     global fonts
     global town_lights
@@ -179,8 +180,10 @@ def draw():
     # Display town lights (if ON)
     draw_town_lights()
 
-    # Print coordinates
-    draw_coords(mouseX, mouseY)
+    # Print coordinates on mouse click
+    if mousePressed:
+        draw_coords(mouseX, mouseY)
+        cursor(CROSS)
 
     # Display the moon
     draw_moon()
