@@ -18,7 +18,7 @@ moon_speed_y = 0.0
 moon_diameter = 55
 
 class Moon(object):
-    def __init__(self, x, y, xdir, ydir, xspeed, yspeed, diameter):
+    def __init__(self, x, y, xdir, ydir, xspeed, yspeed, diameter, load_image=True):
         self.motion = {}
         self.motion['x'] = x
         self.motion['y'] = y
@@ -26,12 +26,19 @@ class Moon(object):
         self.motion['y-direction'] = ydir
         self.motion['x-speed'] = xspeed
         self.motion['y-speed'] = yspeed
-        
-        # it's a supermoon
+
+        # it's a supermoon!
         self.color = color(255, 255, 255)
-        
+
         # shape
         self.size = diameter
+
+        # image
+        # assuming the file is packed with the class
+        if load_image:
+            self.image = loadImage("./images/moon.png")
+        else:
+            self.image = None
 
     def update_position(self):
         """Calculate our new position. """
@@ -52,8 +59,15 @@ class Moon(object):
         self.motion['y'] += self.motion['y-direction'] * self.motion['y-speed']
 
     def draw(self):
-        fill(self.color)
-        ellipse(int(self.motion['x']), int(self.motion['y']), self.size, self.size)
+        if self.image:
+            pushMatrix()
+            # hardcoded scale factor...we should come back to this
+            scale(0.5)
+            image(self.image, self.motion['x'], self.motion['y'])
+            popMatrix()
+        else:
+            fill(self.color)
+            ellipse(int(self.motion['x']), int(self.motion['y']), self.size, self.size)
 
 def cloud_init():
     """Initialize our set of clouds. """
@@ -140,10 +154,10 @@ def setup():
         town_lights.append(light)
 
     # initialize our moon
-    moon = Moon(moon_initial_x, moon_initial_y, 
+    moon = Moon(moon_initial_x, moon_initial_y,
                 moon_direction_x, moon_direction_y,
                 moon_speed_x, moon_speed_y, moon_diameter)
-                
+
     # Initialize our cloud(s)
     cloud_init()
 
