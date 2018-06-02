@@ -9,6 +9,51 @@ max_cloud_puff_count = 150
 max_cloud_puff_diameter = 50
 max_cloud_length = 100
 max_cloud_height = 20
+moon_initial_x = 140
+moon_initial_y = 84
+moon_direction_x = 1
+moon_direction_y = 1
+moon_speed_x = 0.3
+moon_speed_y = 0.0
+moon_diameter = 55
+
+class Moon(object):
+    def __init__(self, x, y, xdir, ydir, xspeed, yspeed, diameter):
+        self.motion = {}
+        self.motion['x'] = x
+        self.motion['y'] = y
+        self.motion['x-direction'] = xdir
+        self.motion['y-direction'] = ydir
+        self.motion['x-speed'] = xspeed
+        self.motion['y-speed'] = yspeed
+        
+        # it's a supermoon
+        self.color = color(255, 255, 255)
+        
+        # shape
+        self.size = diameter
+
+    def update_position(self):
+        """Calculate our new position. """
+
+        # reset our x-position if we reach the end of the display
+        if self.motion['x'] >= width and self.motion['x-direction'] > 0:
+            self.motion['x'] = 0
+        elif self.motion['x'] <= 0 and self.motion['x-direction'] < 0:
+            self.motion['y'] = width
+
+        # reset our y-position if we reach the end of the display
+        if self.motion['y'] >= height and self.motion['y-direction'] > 0:
+            self.motion['y'] = 0
+        elif self.motion['y'] <= 0 and self.motion['y-direction'] < 0:
+            self.motion['y'] = height
+
+        self.motion['x'] += self.motion['x-direction'] * self.motion['x-speed']
+        self.motion['y'] += self.motion['y-direction'] * self.motion['y-speed']
+
+    def draw(self):
+        fill(self.color)
+        ellipse(int(self.motion['x']), int(self.motion['y']), self.size, self.size)
 
 def cloud_init():
     """Initialize our set of clouds. """
@@ -94,12 +139,11 @@ def setup():
                 }
         town_lights.append(light)
 
-    # initialize our moon position
-    moon = { 'x': 140, 'y': 84,
-             'x-direction': 1, 'y-direction': 1,
-             'x-speed': 0.3, 'y-speed': 0.0
-           }
-
+    # initialize our moon
+    moon = Moon(moon_initial_x, moon_initial_y, 
+                moon_direction_x, moon_direction_y,
+                moon_speed_x, moon_speed_y, moon_diameter)
+                
     # Initialize our cloud(s)
     cloud_init()
 
@@ -132,39 +176,17 @@ def draw_town_lights():
         if light['state']:
             image(light['image'], light['x'], light['y'])
 
-def draw_moon():
-    """Calculate position of moon and draw it. """
-
-    # its a supermoon
-    fill(255, 255, 255)
-
-    # reset our x-position if we reach the end of the display
-    if moon['x'] >= width and moon['x-direction'] > 0:
-        moon['x'] = 0
-    elif moon['x'] <= 0 and moon['x-direction'] < 0:
-        moon['y'] = width
-
-    # reset our y-position if we reach the end of the display
-    if moon['y'] >= height and moon['y-direction'] > 0:
-        moon['y'] = 0
-    elif moon['y'] <= 0 and moon['y-direction'] < 0:
-        moon['y'] = height
-
-    moon['x'] += moon['x-direction'] * moon['x-speed']
-    moon['y'] += moon['y-direction'] * moon['y-speed']
-    ellipse(int(moon['x']), int(moon['y']), 55, 55)
-
 def draw_clouds():
     """Calculate cloud positions and draw. """
 
     for cloud in clouds:
         # reset our x-position if we reach the end of the display.
         # we assume max_cloud_length to allow the cloud to float completely off screen
-        if cloud['x']+max_cloud_length/2 >= width and moon['x-direction'] < 0:
+        if cloud['x']+max_cloud_length/2 >= width and moon.motion['x-direction'] < 0:
             cloud['x'] = 0
-        elif cloud['x']+max_cloud_length/2 <= 0 and moon['x-direction'] > 0:
+        elif cloud['x']+max_cloud_length/2 <= 0 and moon.motion['x-direction'] > 0:
             cloud['x'] = width
-        cloud['x'] += -1*moon['x-direction']*moon['x-speed']
+        cloud['x'] += -1*moon.motion['x-direction']*moon.motion['x-speed']
         shape(cloud['shape'], cloud['x'], cloud['y'])
 
 def draw():
@@ -183,7 +205,8 @@ def draw():
         cursor(CROSS)
 
     # Display the moon
-    draw_moon()
+    moon.update_position()
+    moon.draw()
 
     # Display the clouds
     draw_clouds()
