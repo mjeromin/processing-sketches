@@ -62,8 +62,9 @@ class Moon(object):
         if self.image:
             pushMatrix()
             # hardcoded scale factor...we should come back to this
-            scale(0.5)
-            image(self.image, self.motion['x'], self.motion['y'])
+            scale_factor = 0.3
+            scale(scale_factor)
+            image(self.image, self.motion['x']/scale_factor, self.motion['y']/scale_factor)
             popMatrix()
         else:
             fill(self.color)
