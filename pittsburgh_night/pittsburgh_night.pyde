@@ -5,8 +5,6 @@
 from Moon import *
 from Clouds import * 
 
-max_town_lights = 20
-max_cloud_count = 100
 moon_initial_x = 140
 moon_initial_y = 84
 moon_direction_x = 1
@@ -14,6 +12,47 @@ moon_direction_y = 1
 moon_speed_x = 0.3
 moon_speed_y = 0.0
 moon_diameter = 55
+
+class TownLights(object):
+    
+    # Initialize state of lights
+    # random count and placement along building #1
+    def __init__(self, xpos, ypos, xlen, ylen, max_town_lights=20):
+        self.lights = []
+        light_count = int(random(max_town_lights)) 
+        for i in range(light_count):
+            x = int(xpos+random(xlen))
+            y = int(ypos+random(ylen))
+            light = { "x": x, "y": y,
+                         "state": True, "next": millis(),
+                         "image": loadImage("./images/light1.png")
+                    }
+            self.lights.append(light)
+
+    def update(self, off_duration=30000, on_duration=10000):
+        """Update state of town lights. """
+
+        # Flip the state if time expired
+        for light in self.lights:
+            if millis() > light['next'] and light['state']:
+                light['state'] = False
+                light['next'] = millis() + random(on_duration)
+            elif millis() > light['next']:
+                light['state'] = True
+                light['next'] = millis() + random(off_duration)
+
+    def draw(self):
+        """Display town lights if ON. """
+        
+        for light in self.lights:
+            if light['state']:
+                image(light['image'], light['x'], light['y'])
+
+    def __getitem__(self, item):
+        return self.lights[item] # delegate to lights.__getitem__
+
+    def count(self):
+        return len(self.lights)
 
 def setup():
     size(1024, 444, P3D)
@@ -40,20 +79,11 @@ def setup():
     fonts['coords'] = createFont("monofur", 12)
     fonts['title'] = createFont("HamburgerHeaven", 42)
 
-    # Initialize state of lights
-    # random count and placement along building #1
-    town_lights = []
-    town_light_count = int(random(max_town_lights))
-    print "producing {} lights for building #1".format(town_light_count)
-    for i in range(town_light_count):
-        x = int(600+random(57))
-        y = int(273+random(76))
-        print "producing light at ({},{})".format(x,y)
-        light = { "x": x, "y": y,
-                     "state": True, "next": millis(),
-                     "image": loadImage("./images/light1.png")
-                }
-        town_lights.append(light)
+    # initialize our town lights
+    town_lights = TownLights(600, 273, 57, 76)
+    for light in town_lights:
+        print "Generated light at ({}, {})".format(light['x'], light['y'])
+    print "Generated {} town lights in building #1".format(town_lights.count())
 
     # initialize our moon
     moon = Moon(moon_initial_x, moon_initial_y,
@@ -74,24 +104,10 @@ def draw_title(x, y):
     fill(240, 174, 0)
     text("Pittsburgh", x, y)
 
-def update_town_lights():
-    """Update state of town lights. """
-
-    # Flip the state if time expired
-    for light in town_lights:
-        if millis() > light['next'] and light['state']:
-            light['state'] = False
-            light['next'] = millis() + random(10000)
-        elif millis() > light['next']:
-            light['state'] = True
-            light['next'] = millis() + random(30000)
-
 def draw_town_lights():
-    """Display town lights if ON. """
-
-    for light in town_lights:
-        if light['state']:
-            image(light['image'], light['x'], light['y'])
+    """Update and display town lights if ON. """
+    town_lights.update()
+    town_lights.draw()
 
 def draw_clouds():
     # opposite direction than moon
@@ -102,9 +118,6 @@ def draw_clouds():
 def draw():
     background(0)
     image(images['skyline'], 0, 0) # Display the skyline
-
-    # Update the town lights
-    update_town_lights()
 
     # Display town lights (if ON)
     draw_town_lights()
