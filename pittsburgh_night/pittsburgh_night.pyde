@@ -23,6 +23,11 @@ def setup():
     global town_lights
     global moon
     global clouds
+    global recording
+
+    # Disable recording flag
+    recording = {}
+    recording['enabled'] = False
 
     # load image of downtown Pittsburgh at night (phone camera)
     images = {}
@@ -110,7 +115,12 @@ def draw():
         draw_coords(mouseX, mouseY)
         cursor()
 
-    # Output to frames (this could take a while).
-    # Then stitch them together using ffmpeg:
-    #     ffmpeg -r 60 -i frames/frame-%4d.png -pix_fmt yuv420p -r 60 frames/video.mp4
-    #saveFrame("frames/frame-####.png")
+    # Record output to frames when 'R' is pressed (this could take a while).
+    # Stitch the frames together using PYDE tool or ffmpeg:
+    #     ffmpeg -r 60 -i frames/frame-%4d.tif -pix_fmt yuv420p -r 60 frames/video.mp4
+    if keyPressed and key == 'R':
+        print "Recording Mode Enabled!"
+        recording['enabled'] = True
+    if recording['enabled']:
+        saveFrame("frames/frame-####.tif")
+
