@@ -39,11 +39,22 @@ def setup():
     fonts['coords'] = createFont("monofur", 12)
     fonts['title'] = createFont("HamburgerHeaven", 42)
 
-    # initialize our town lights
-    town_lights = TownLights(600, 273, 57, 76)
-    for light in town_lights:
-        print "Generated light at ({}, {})".format(light['x'], light['y'])
-    print "Generated {} town lights in building #1".format(town_lights.count())
+    # Initialize our town lights.
+    # We use x,y of the top-left building corner, then width, length of light positions
+    town_lights = []
+    building1_lights = TownLights(600, 273, 57, 76)
+    building2_lights = TownLights(719, 283, 79, 48)
+    building3_lights = TownLights(790, 242, 42, 41)
+
+    # track each set of building lights under town_lights array
+    town_lights.append(building1_lights)
+    town_lights.append(building2_lights)
+    town_lights.append(building3_lights)
+
+    for i, building_lights in enumerate(town_lights):
+        for light in building_lights:
+            print "Generated light at ({}, {})".format(light['x'], light['y'])
+        print "Generated {} lights for building #{}".format(building_lights.count(), i+1)
 
     # initialize our moon
     moon = Moon(moon_initial_x, moon_initial_y,
@@ -66,8 +77,10 @@ def draw_title(x, y):
 
 def draw_town_lights():
     """Update and display town lights if ON. """
-    town_lights.update()
-    town_lights.draw()
+
+    for building_lights in town_lights:
+        building_lights.update()
+        building_lights.draw()
 
 def draw_clouds():
     # opposite direction than moon
@@ -82,11 +95,6 @@ def draw():
     # Display town lights (if ON)
     draw_town_lights()
 
-    # Print coordinates on mouse click
-    if mousePressed:
-        draw_coords(mouseX, mouseY)
-        cursor(CROSS)
-
     # Display the moon
     moon.update_position()
     moon.draw()
@@ -96,6 +104,11 @@ def draw():
 
     # Display the title
     draw_title(2*width/5, 40)
+
+    # Print coordinates on mouse click
+    if mousePressed:
+        draw_coords(mouseX, mouseY)
+        cursor()
 
     # Output to frames (this could take a while).
     # Then stitch them together using ffmpeg:
