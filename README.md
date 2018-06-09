@@ -6,3 +6,6 @@ This sketch starts with a photo of the Pittsburgh skyline. During animation, it 
 
 tl;dr, a video was captured and uploaded to youtube:
 [![Pittsburgh Night YouTube Video](https://img.youtube.com/vi/cxPIAd43B6w/0.jpg)](https://youtu.be/cxPIAd43B6w)
+
+## Laser Circle Sight
+This sketch draws a circle with a line from the center to act as a sight. The sight will follow the mouse coordinates and on mouse click it will fire a laser beam.
