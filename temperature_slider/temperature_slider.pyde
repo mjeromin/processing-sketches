@@ -9,11 +9,7 @@ def setup():
     size(640, 640)
     global colors
     global tempRange
-    global sliderX
-    global sliderY
-    global sliderW
-    global sliderH
-    global sliderGrab
+    global slider
 
     tempRange = [10, 20]
 
@@ -21,15 +17,19 @@ def setup():
     colors = {}
     colors['white'] = color(255, 255, 255)
     
-    sliderX = mouseX
-    sliderY = 0 # constant
-    sliderW = 10 # constant
-    sliderH = 10 # constant
-    sliderGrab = False
+    slider = {}
+    slider['x'] = width/2
+    slider['y'] = height/2
+    slider['w'] = 50
+    slider['h'] = 50
+    slider['grab'] = False
 
-def inzone(x, y, w, h):
+def inzone(xpos, ypos, x, y, w, h):
     # return True/False
-    pass
+    if x-(1.0*w/2) <= xpos <= x+(1.0*w/2) and y-(1.0*h/2) <= ypos <= y+(1.0*h/2):
+        return True
+    else:
+        return False
 
 def xpos_to_temperature_value(xpos, width):
     """Return temperature associated with cool/heat. """
@@ -42,21 +42,32 @@ def xpos_to_temperature_color(xpos, width):
     blue = 174*(1-1.0*xpos/width)
     return color(red, green, blue)
 
-def draw_slider(x):
+def draw_slider():
+    """Draw the slider widget. """
+    
     # draw line (0,width)
     # draw tick marks, mark=width/10, font numbers
     # draw widget shape (ie. circle with icon)
-    pass
-
+    ellipse(slider['x'], slider['y'], slider['w'], slider['h'])
+          
 def draw():
-    temperature = xpos_to_temperature_value(mouseX, width)
+    temperature = xpos_to_temperature_value(slider['x'], width)
     print("Temperature: {}".format(temperature))
-    bg_color = xpos_to_temperature_color(mouseX, width)
+    bg_color = xpos_to_temperature_color(slider['x'], width)
     background(bg_color)
-    #draw_slider(sliderX)
-    #if mousePressed and inzone(sliderX, sliderY, sliderW, sliderH):
-    #    sliderGrab = True
-    #elif not mousePressed:
-    #    sliderGrab = False
-    #if sliderGrab:
-    #    sliderX = mouseX
+    draw_slider()
+    if mousePressed and inzone(mouseX, mouseY,
+                               slider['x'], slider['y'],
+                               slider['w'], slider['h']):
+        slider['grab'] = True
+        print("mousePressed and InZone, grabbing slider at ({},{})".format(mouseX,mouseY))
+    elif not mousePressed:
+        slider['grab'] = False
+        print("mouseNotPressed, slider at ({},{})".format(slider['x'],slider['y']))
+    if slider['grab']:
+        #sane limits, keep the slider in the display
+        if 0 <= mouseX <= width:
+            slider['x'] = mouseX
+            print("slider set to ({},{})".format(slider['x'],slider['y']))
+        else:
+            print("slider out of bounds, ignoring update.")
