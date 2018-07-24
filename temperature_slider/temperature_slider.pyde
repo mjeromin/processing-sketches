@@ -26,8 +26,8 @@ def setup():
     # Download these font packs and put them in your sketch directory or your ~/.fonts/
     # https://www.dafont.com/monofur.font
     # Create the fonts for temperature values
-    font_size = 95
-    fonts['temperature'] = { 'font': createFont("monofur", font_size), 'size': font_size }
+    fonts['temperature'] = { 'font': createFont("monofur", 95), 'size': 95 }
+    fonts['tick_label'] = { 'font': createFont("monofur", 22), 'size': 22 }
     
     slider = {}
     slider['x'] = width/2
@@ -57,10 +57,16 @@ def xpos_to_temperature_color(xpos, width):
 
 def draw_slider():
     """Draw the slider widget. """
-    
-    # draw line (0,width)
-    # draw tick marks, mark=width/10, font numbers
+
     # draw widget shape (ie. circle with icon)
+    line(0, slider['y'], width, slider['y'])
+    textFont(fonts['tick_label']['font'])
+    fill(0, 0, 0)
+    for i in range(10):
+        x = i*width/10
+        text("|", x, slider['y']-10)
+        text(xpos_to_temperature_value(x, width), x, slider['y']-30)
+    fill(255, 255, 255)
     ellipse(slider['x'], slider['y'], slider['w'], slider['h'])
 
 def draw_temperature_value(value):
