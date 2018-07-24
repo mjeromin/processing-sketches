@@ -3,19 +3,31 @@
   https://dev.to/ederchrono/making-an-animated-slider---wotw-mkj
 """
 
-# from colors import white
+# Jython/processing unicode issues force me to avoid degrees symbol
+#celsius = "°C"
+celsius = "C"
+#fahrenheit = "°F"
+fahrenheit = "F"
 
 def setup():
     size(640, 640)
-    global colors
     global tempRange
     global slider
+    global fonts
+    global use_celsius
 
-    tempRange = [10, 20]
+    # The range in temperature settings, F
+    tempRange = [60, 80]
 
-    # colors = Colors()
-    colors = {}
-    colors['white'] = color(255, 255, 255)
+    # Celsius or Fahrenheit
+    use_celsius = False
+
+    fonts = {}
+    # Download these font packs and put them in your sketch directory or your ~/.fonts/
+    # https://www.dafont.com/monofur.font
+    # Create the fonts for temperature values
+    font_size = 95
+    fonts['temperature'] = { 'font': createFont("monofur", font_size), 'size': font_size }
     
     slider = {}
     slider['x'] = width/2
@@ -25,7 +37,8 @@ def setup():
     slider['grab'] = False
 
 def inzone(xpos, ypos, x, y, w, h):
-    # return True/False
+    """Return True if xpos, ypos is inside the x,y,w,h zone, else return False. """
+
     if x-(1.0*w/2) <= xpos <= x+(1.0*w/2) and y-(1.0*h/2) <= ypos <= y+(1.0*h/2):
         return True
     else:
@@ -49,13 +62,24 @@ def draw_slider():
     # draw tick marks, mark=width/10, font numbers
     # draw widget shape (ie. circle with icon)
     ellipse(slider['x'], slider['y'], slider['w'], slider['h'])
-          
+
+def draw_temperature_value(value):
+    """Draw temperature value param."""
+
+    textFont(fonts['temperature']['font'])
+    fill(255, 255, 255)
+    if use_celsius:
+        text("{} {}".format(value, celsius), width/2, fonts['temperature']['size'])
+    else:
+        text("{} {}".format(value, fahrenheit), width/2, fonts['temperature']['size'])
+
 def draw():
     temperature = xpos_to_temperature_value(slider['x'], width)
     print("Temperature: {}".format(temperature))
     bg_color = xpos_to_temperature_color(slider['x'], width)
     background(bg_color)
     draw_slider()
+    draw_temperature_value(temperature)
     if mousePressed and inzone(mouseX, mouseY,
                                slider['x'], slider['y'],
                                slider['w'], slider['h']):
