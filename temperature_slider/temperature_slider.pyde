@@ -88,7 +88,6 @@ def draw_temperature_value(value):
 
 def draw():
     temperature = xpos_to_temperature_value(slider['x'], width)
-    print("Temperature: {}".format(temperature))
     bg_color = xpos_to_temperature_color(slider['x'], width)
     background(bg_color)
     draw_slider(slider['x'], slider['y'], slider['w'], slider['h'], width)
@@ -97,14 +96,14 @@ def draw():
                                slider['x'], slider['y'],
                                slider['w'], slider['h']):
         slider['grab'] = True
-        print("mousePressed and InZone, grabbing slider at ({},{})".format(mouseX,mouseY))
     elif not mousePressed:
         slider['grab'] = False
-        print("mouseNotPressed, slider at ({},{})".format(slider['x'],slider['y']))
     if slider['grab']:
         #sane limits, keep the slider in the display
         if 0 <= mouseX <= width:
             slider['x'] = mouseX
-            print("slider set to ({},{})".format(slider['x'],slider['y']))
+            print("slider set to ({},{}), temperature {}".format(slider['x'],
+                                                                 slider['y'],
+                                                                 temperature))
         else:
             print("slider out of bounds, ignoring update.")
