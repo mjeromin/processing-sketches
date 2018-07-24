@@ -30,44 +30,51 @@ def setup():
     fonts['tick_label'] = { 'font': createFont("monofur", 22), 'size': 22 }
     
     slider = {}
+    # initial position is in center of display
     slider['x'] = width/2
     slider['y'] = height/2
+    # slider ellipse size
     slider['w'] = 50
     slider['h'] = 50
+    # grab tracks whether the user has grabbed the slider
     slider['grab'] = False
 
 def inzone(xpos, ypos, x, y, w, h):
-    """Return True if xpos, ypos is inside the x,y,w,h zone, else return False. """
+    """Return True if xpos, ypos is inside the x[+/-]w,y[+/-]h zone, else return False. """
 
     if x-(1.0*w/2) <= xpos <= x+(1.0*w/2) and y-(1.0*h/2) <= ypos <= y+(1.0*h/2):
         return True
     else:
         return False
 
-def xpos_to_temperature_value(xpos, width):
-    """Return temperature associated with cool/heat. """
-    return int(tempRange[0] + (tempRange[1] - tempRange[0])*(1.0*xpos/width))
+def xpos_to_temperature_value(xpos, xmax):
+    """Return temperature associated with cool/heat relative to slider x-position. """
+    return int(tempRange[0] + (tempRange[1] - tempRange[0])*(1.0*xpos/xmax))
 
-def xpos_to_temperature_color(xpos, width):
-    """Return color associated with cool/heat. Blue to Orange gradient-ish."""
-    red = 20+235*xpos/width
-    green = 154-20*xpos/width
-    blue = 174*(1-1.0*xpos/width)
+def xpos_to_temperature_color(xpos, xmax):
+    """Return color associated with cool/heat relative to slider x-position.
+    RGB values here should produce a Blue to Orange gradient.
+    """
+    red = 20+235*xpos/xmax
+    green = 154-20*xpos/xmax
+    blue = 174*(1-1.0*xpos/xmax)
     return color(red, green, blue)
 
-def draw_slider():
+def draw_slider(xpos, ypos, slider_ht, slider_wd, xmax):
     """Draw the slider widget. """
 
-    # draw widget shape (ie. circle with icon)
-    line(0, slider['y'], width, slider['y'])
+    tick_mark_ypos = ypos-0.5*slider_ht
+    tick_label_ypos = ypos-slider_ht
+
+    line(0, ypos, xmax, ypos)
     textFont(fonts['tick_label']['font'])
     fill(0, 0, 0)
     for i in range(10):
-        x = i*width/10
-        text("|", x, slider['y']-10)
-        text(xpos_to_temperature_value(x, width), x, slider['y']-30)
+        x = i*xmax/10
+        text("|", x, tick_mark_ypos)
+        text(xpos_to_temperature_value(x, xmax), x, tick_label_ypos)
     fill(255, 255, 255)
-    ellipse(slider['x'], slider['y'], slider['w'], slider['h'])
+    ellipse(xpos, ypos, slider_wd, slider_ht)
 
 def draw_temperature_value(value):
     """Draw temperature value param."""
@@ -84,7 +91,7 @@ def draw():
     print("Temperature: {}".format(temperature))
     bg_color = xpos_to_temperature_color(slider['x'], width)
     background(bg_color)
-    draw_slider()
+    draw_slider(slider['x'], slider['y'], slider['w'], slider['h'], width)
     draw_temperature_value(temperature)
     if mousePressed and inzone(mouseX, mouseY,
                                slider['x'], slider['y'],
