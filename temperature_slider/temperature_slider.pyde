@@ -14,6 +14,7 @@ def setup():
     global tempRange
     global slider
     global fonts
+    global images
     global use_celsius
 
     # The range in temperature settings, F
@@ -28,6 +29,12 @@ def setup():
     # Create the fonts for temperature values
     fonts['temperature'] = { 'font': createFont("monofur", 95), 'size': 95 }
     fonts['tick_label'] = { 'font': createFont("monofur", 22), 'size': 22 }
+
+    images = {}
+    # Download GLYPHICONS FREE at http://glyphicons.com/ and install under images/glyphicons_free
+    # GLYPHICONS FREE are released under the Creative Commons Attribution 3.0 Unported (CC BY 3.0).
+    # The Full license can be found here: http://glyphicons.com/license/
+    images['glyphicons-730-temperature'] = loadImage("../images/glyphicons_free/glyphicons/png/glyphicons-730-temperature.png")
     
     slider = {}
     # initial position is in center of display
@@ -75,6 +82,7 @@ def draw_slider(xpos, ypos, slider_ht, slider_wd, xmax):
         text(xpos_to_temperature_value(x, xmax), x, tick_label_ypos)
     fill(255, 255, 255)
     ellipse(xpos, ypos, slider_wd, slider_ht)
+    image(images['glyphicons-730-temperature'], xpos-slider_wd/10, ypos-slider_ht/4)
 
 def draw_temperature_value(value):
     """Draw temperature value param."""
