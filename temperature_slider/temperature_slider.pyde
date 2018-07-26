@@ -9,6 +9,9 @@ celsius = "C"
 #fahrenheit = "°F"
 fahrenheit = "F"
 
+temperature_padding = 0.1
+temperature_step = 0.01
+
 def setup():
     size(640, 640)
     global tempRange
@@ -16,6 +19,7 @@ def setup():
     global fonts
     global images
     global use_celsius
+    global current_temperature
 
     # The range in temperature settings, F
     tempRange = [60, 80]
@@ -23,11 +27,16 @@ def setup():
     # Celsius or Fahrenheit
     use_celsius = False
 
+    # default current_temperature
+    current_temperature = 60+random(tempRange[1]-tempRange[0])
+
     fonts = {}
     # Download these font packs and put them in your sketch directory or your ~/.fonts/
     # https://www.dafont.com/monofur.font
     # Create the fonts for temperature values
-    fonts['temperature'] = { 'font': createFont("monofur", 95), 'size': 95 }
+    fonts['slider_temperature'] = { 'font': createFont("monofur", 85), 'size': 85 }
+    fonts['current_temperature'] = { 'font': createFont("monofur", 20), 'size': 20 }
+    fonts['climate_control'] = { 'font': createFont("monofur", 22), 'size': 22 }
     fonts['tick_label'] = { 'font': createFont("monofur", 22), 'size': 22 }
 
     images = {}
@@ -77,9 +86,10 @@ def draw_slider(xpos, ypos, slider_ht, slider_wd, xmax):
     tick_mark_ypos = ypos-0.5*slider_ht
     tick_label_ypos = ypos-slider_ht
 
+    fill(95, 4, 121)
+    stroke(95, 4, 121)
     line(0, ypos, xmax, ypos)
     textFont(fonts['tick_label']['font'])
-    fill(0, 0, 0)
     for i in range(10):
         x = i*xmax/10
         text("|", x, tick_mark_ypos)
@@ -99,22 +109,54 @@ def draw_slider(xpos, ypos, slider_ht, slider_wd, xmax):
     else:
         image(images['glyphicons-697-temperature-high-warn'], xpos-slider_wd/10, ypos-slider_ht/4)
 
-def draw_temperature_value(value):
+def draw_temperature_value(value, font, xpos, ypos, label=None):
     """Draw temperature value param."""
 
-    textFont(fonts['temperature']['font'])
-    fill(255, 255, 255)
+    textFont(font)
+    fill(95, 4, 121)
     if use_celsius:
-        text("{} {}".format(value, celsius), width/2, fonts['temperature']['size'])
+        if label:
+            text("{} {}\n{}".format(int(value), celsius, label), xpos, ypos)
+        else:
+            text("{} {}".format(int(value), celsius), xpos, ypos)
+    elif label:
+        text("{} {}\n{}".format(int(value), fahrenheit, label), xpos, ypos)
     else:
-        text("{} {}".format(value, fahrenheit), width/2, fonts['temperature']['size'])
+        text("{} {}".format(int(value), fahrenheit), xpos, ypos)
+
+def draw_climate_control_operation(climate_control):
+    """Display the climate control operation if it is being performed"""
+
+    if climate_control:
+        textFont(fonts['climate_control']['font'])
+        fill(95, 4, 121)
+        text(climate_control, width/2, height/4 - 50)
 
 def draw():
+    global current_temperature
+    climate_control = None
     temperature = xpos_to_temperature_value(slider['x'], width)
-    bg_color = xpos_to_temperature_color(slider['x'], width)
-    background(bg_color)
+    if current_temperature+temperature_padding < temperature:
+        # increase the current temperature in steps
+        current_temperature += temperature_step
+        bg_color = xpos_to_temperature_color(slider['x'], width)
+        background(bg_color)
+        draw_climate_control_operation("Heating")
+    elif current_temperature-temperature_padding > temperature:
+        # decrease the current temperature in steps
+        current_temperature -= temperature_step
+        bg_color = xpos_to_temperature_color(slider['x'], width)
+        background(bg_color)
+        draw_climate_control_operation("Cooling")
+    else:
+        # default to black when climate is not changing
+        bg_color = color(0, 0, 0)
+        background(bg_color)
     draw_slider(slider['x'], slider['y'], slider['w'], slider['h'], width)
-    draw_temperature_value(temperature)
+    draw_temperature_value(temperature, fonts['slider_temperature']['font'],
+                           width/2, fonts['slider_temperature']['size'])
+    draw_temperature_value(current_temperature, fonts['current_temperature']['font'],
+                           width/4, fonts['slider_temperature']['size']*0.75, "current")
     if mousePressed and inzone(mouseX, mouseY,
                                slider['x'], slider['y'],
                                slider['w'], slider['h']):
