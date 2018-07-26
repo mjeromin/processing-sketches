@@ -35,6 +35,10 @@ def setup():
     # GLYPHICONS FREE are released under the Creative Commons Attribution 3.0 Unported (CC BY 3.0).
     # The Full license can be found here: http://glyphicons.com/license/
     images['glyphicons-730-temperature'] = loadImage("../images/glyphicons_free/glyphicons/png/glyphicons-730-temperature.png")
+    images['glyphicons-694-temperature-low'] = loadImage("../images/glyphicons_free/glyphicons/png/glyphicons-694-temperature-low.png")
+    images['glyphicons-695-temperature-high'] = loadImage("../images/glyphicons_free/glyphicons/png/glyphicons-695-temperature-high.png")
+    images['glyphicons-696-temperature-low-warn'] = loadImage("../images/glyphicons_free/glyphicons/png/glyphicons-696-temperature-low-warning.png")
+    images['glyphicons-697-temperature-high-warn'] = loadImage("../images/glyphicons_free/glyphicons/png/glyphicons-697-temperature-high-warning.png")
     
     slider = {}
     # initial position is in center of display
@@ -82,7 +86,18 @@ def draw_slider(xpos, ypos, slider_ht, slider_wd, xmax):
         text(xpos_to_temperature_value(x, xmax), x, tick_label_ypos)
     fill(255, 255, 255)
     ellipse(xpos, ypos, slider_wd, slider_ht)
-    image(images['glyphicons-730-temperature'], xpos-slider_wd/10, ypos-slider_ht/4)
+
+    # Select the appropriate glyphicon depending on slider position
+    if 1.0*xpos/xmax < 0.1:
+        image(images['glyphicons-696-temperature-low-warn'], xpos-slider_wd/10, ypos-slider_ht/4)
+    elif 1.0*xpos/xmax < 0.4:
+        image(images['glyphicons-694-temperature-low'], xpos-slider_wd/10, ypos-slider_ht/4)
+    elif 1.0*xpos/xmax < 0.6:
+        image(images['glyphicons-730-temperature'], xpos-slider_wd/10, ypos-slider_ht/4)
+    elif 1.0*xpos/xmax < 0.9:
+        image(images['glyphicons-695-temperature-high'], xpos-slider_wd/10, ypos-slider_ht/4)
+    else:
+        image(images['glyphicons-697-temperature-high-warn'], xpos-slider_wd/10, ypos-slider_ht/4)
 
 def draw_temperature_value(value):
     """Draw temperature value param."""
