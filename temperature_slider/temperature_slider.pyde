@@ -3,54 +3,88 @@
   https://dev.to/ederchrono/making-an-animated-slider---wotw-mkj
 """
 
+# purple-ish look
+font_color = (95, 4, 121)
+
+# Download this font pack and put it in your sketch directory or your ~/.fonts/
+# https://www.dafont.com/alien-encounters.font
+font_name = "Alien Encounters" 
+
+# Download GLYPHICONS FREE at http://glyphicons.com/ and install under images/glyphicons_free
+# GLYPHICONS FREE are released under the Creative Commons Attribution 3.0 Unported (CC BY 3.0).
+# The Full license can be found here: http://glyphicons.com/license/
+glyphicons_730_temperature_image = "../images/glyphicons_free/glyphicons/png/glyphicons-730-temperature.png"
+glyphicons_694_temperature_low_image = "../images/glyphicons_free/glyphicons/png/glyphicons-694-temperature-low.png"
+glyphicons_695_temperature_high_image = "../images/glyphicons_free/glyphicons/png/glyphicons-695-temperature-high.png"
+glyphicons_696_temperature_low_warn_image = "../images/glyphicons_free/glyphicons/png/glyphicons-696-temperature-low-warning.png"
+glyphicons_697_temperature_high_warn_image = "../images/glyphicons_free/glyphicons/png/glyphicons-697-temperature-high-warning.png"
+glyphicons_22_snowflake_image = "../images/glyphicons_free/glyphicons/png/glyphicons-22-snowflake.png"
+glyphicons_23_fire_image = "../images/glyphicons_free/glyphicons/png/glyphicons-23-fire.png"
+propeller_image = "../images/propeller.png"
+
 # Jython/processing unicode issues force me to avoid degrees symbol
 #celsius = "°C"
 celsius = "C"
 #fahrenheit = "°F"
 fahrenheit = "F"
 
+# The range in temperature settings, F
+min_temperature = 60
+max_temperature = 80
+
+# Allow current temp to reach target temp +/- padding.
+# This also removes many restrictions and logic around size.
 temperature_padding = 0.1
 temperature_step = 0.01
 
+
 def setup():
-    size(640, 640)
-    global tempRange
+    size(640, 450)
     global slider
     global fan
     global fonts
     global images
-    global use_celsius
-    global current_temperature
+    global climate_control
+    global white
+    global black
 
-    # The range in temperature settings, F
-    tempRange = [60, 80]
+    # convenience
+    white = color(255, 255, 255)
+    black = color(0, 0, 0)
+
+    climate_control = {}
+    climate_control['tempRange'] = [min_temperature, max_temperature]
 
     # Celsius or Fahrenheit
-    use_celsius = False
+    climate_control['use_celsius'] = False
 
     # default current_temperature
-    current_temperature = 60+random(tempRange[1]-tempRange[0])
+    climate_control['current_temperature'] = 60+random(max_temperature-min_temperature)
+
+    # default mode
+    climate_control['mode'] = None
 
     fonts = {}
-    # Download these font packs and put them in your sketch directory or your ~/.fonts/
-    # https://www.dafont.com/alien-encounters.font
+    fonts['color'] = color(font_color[0], font_color[1], font_color[2])
     # Create the fonts for temperature values
-    fonts['slider_temperature'] = { 'font': createFont("Alien Encounters", 85), 'size': 85 }
-    fonts['current_temperature'] = { 'font': createFont("Alien Encounters", 20), 'size': 20 }
-    fonts['climate_control'] = { 'font': createFont("Alien Encounters", 22), 'size': 22 }
-    fonts['tick_label'] = { 'font': createFont("Alien Encounters", 22), 'size': 22 }
-    fonts['fan_label'] = { 'font': createFont("Alien Encounters", 12), 'size': 12 }
+    fonts['slider_temperature'] = { 'font': createFont(font_name, 85), 'size': 85 }
+    fonts['current_temperature'] = { 'font': createFont(font_name, 20), 'size': 20 }
+    fonts['climate_control'] = { 'font': createFont(font_name, 22), 'size': 22 }
+    fonts['tick_label'] = { 'font': createFont(font_name, 22), 'size': 22 }
+    fonts['fan_label'] = { 'font': createFont(font_name, 12), 'size': 12 }
 
     images = {}
     # Download GLYPHICONS FREE at http://glyphicons.com/ and install under images/glyphicons_free
     # GLYPHICONS FREE are released under the Creative Commons Attribution 3.0 Unported (CC BY 3.0).
     # The Full license can be found here: http://glyphicons.com/license/
-    images['glyphicons-730-temperature'] = loadImage("../images/glyphicons_free/glyphicons/png/glyphicons-730-temperature.png")
-    images['glyphicons-694-temperature-low'] = loadImage("../images/glyphicons_free/glyphicons/png/glyphicons-694-temperature-low.png")
-    images['glyphicons-695-temperature-high'] = loadImage("../images/glyphicons_free/glyphicons/png/glyphicons-695-temperature-high.png")
-    images['glyphicons-696-temperature-low-warn'] = loadImage("../images/glyphicons_free/glyphicons/png/glyphicons-696-temperature-low-warning.png")
-    images['glyphicons-697-temperature-high-warn'] = loadImage("../images/glyphicons_free/glyphicons/png/glyphicons-697-temperature-high-warning.png")
-    images['propeller'] = loadImage("../images/propeller.png")
+    images['glyphicons-730-temperature'] = loadImage(glyphicons_730_temperature_image)
+    images['glyphicons-694-temperature-low'] = loadImage(glyphicons_694_temperature_low_image)
+    images['glyphicons-695-temperature-high'] = loadImage(glyphicons_695_temperature_high_image)
+    images['glyphicons-696-temperature-low-warn'] = loadImage(glyphicons_696_temperature_low_warn_image)
+    images['glyphicons-697-temperature-high-warn'] = loadImage(glyphicons_697_temperature_high_warn_image)
+    images['propeller'] = loadImage(propeller_image)
+    images['glyphicons-22-snowflake'] = loadImage(glyphicons_22_snowflake_image)
+    images['glyphicons-23-fire'] = loadImage(glyphicons_23_fire_image)
     
     slider = {}
     # initial position is in center of display
@@ -64,8 +98,6 @@ def setup():
     
     fan = {}
     # initial position
-    #fan['x'] = width/5
-    #fan['y'] = height/5
     fan['x'] = 75
     fan['y'] = 75
     # fan size
@@ -82,9 +114,9 @@ def inzone(xpos, ypos, x, y, w, h):
     else:
         return False
 
-def xpos_to_temperature_value(xpos, xmax):
+def xpos_to_temperature_value(xpos, xmax, tmin, tmax):
     """Return temperature associated with cool/heat relative to slider x-position. """
-    return int(tempRange[0] + (tempRange[1] - tempRange[0])*(1.0*xpos/xmax))
+    return int(tmin + (tmax - tmin)*(1.0*xpos/xmax))
 
 def xpos_to_temperature_color(xpos, xmax):
     """Return color associated with cool/heat relative to slider x-position.
@@ -95,21 +127,21 @@ def xpos_to_temperature_color(xpos, xmax):
     blue = 174*(1-1.0*xpos/xmax)
     return color(red, green, blue)
 
-def draw_slider(xpos, ypos, slider_ht, slider_wd, xmax):
+def draw_slider(xpos, ypos, slider_ht, slider_wd, xmax, tmin, tmax):
     """Draw the slider widget. """
 
     tick_mark_ypos = ypos-0.5*slider_ht
     tick_label_ypos = ypos-slider_ht
 
-    fill(95, 4, 121)
-    stroke(95, 4, 121)
+    fill(fonts['color'])
+    stroke(fonts['color'])
     line(0, ypos, xmax, ypos)
     textFont(fonts['tick_label']['font'])
     for i in range(10):
         x = i*xmax/10
         text("|", x, tick_mark_ypos)
-        text(xpos_to_temperature_value(x, xmax), x, tick_label_ypos)
-    fill(255, 255, 255)
+        text(xpos_to_temperature_value(x, xmax, tmin, tmax), x, tick_label_ypos)
+    fill(white)
     ellipse(xpos, ypos, slider_wd, slider_ht)
 
     # Select the appropriate glyphicon depending on slider position
@@ -128,8 +160,8 @@ def draw_temperature_value(value, font, xpos, ypos, label=None):
     """Draw temperature value param."""
 
     textFont(font)
-    fill(95, 4, 121)
-    if use_celsius:
+    fill(fonts['color'])
+    if climate_control['use_celsius']:
         if label:
             text("{} {}\n{}".format(int(value), celsius, label), xpos, ypos)
         else:
@@ -139,81 +171,108 @@ def draw_temperature_value(value, font, xpos, ypos, label=None):
     else:
         text("{} {}".format(int(value), fahrenheit), xpos, ypos)
 
-def draw_climate_control_operation(climate_control):
-    """Display the climate control operation if it is being performed"""
+def draw_climate_control_mode(mode, xpos, ypos):
+    """Display the climate control mode if it is being performed"""
 
-    if climate_control:
+    def draw_icon(icon_image, icon_scale, x, y):
+            pushMatrix()
+            translate(x, y)
+            scale(icon_scale)
+            image(icon_image, 0, 0)
+            popMatrix()
+
+    if mode == "Heating" or mode == "Cooling":
         textFont(fonts['climate_control']['font'])
-        fill(95, 4, 121)
-        text(climate_control, width/2, height/4 - 50)
+        fill(fonts['color'])
+        text(mode, xpos, ypos)
+        if mode == "Heating":
+            draw_icon(images['glyphicons-23-fire'], 0.5, xpos*1.3, ypos*0.85) 
+        elif mode == "Cooling":
+            draw_icon(images['glyphicons-22-snowflake'], 0.5, xpos*1.3, ypos*0.85)
 
-def draw_fan():
+def draw_fan(xpos, ypos, fan_ht, fan_wd, fan_img, fan_img_scale, fan_enabled):
     """Display the fan, rotate it, and provide a user-friendly indicator."""
 
     pushMatrix()
-    translate(fan['x'], fan['y'])
-    if fan['enabled']:
+    translate(xpos, ypos)
+    if fan_enabled:
         angle = radians(millis()/2 % 360)
     else:
         angle = radians(0)
     rotate(angle)
-    scale(0.5)
-    image(images['propeller'], -1.0*images['propeller'].width/2, -1.0*images['propeller'].height/2)
+    scale(fan_img_scale)
+    image(fan_img, -1.0*fan_img.width/2, -1.0*fan_img.height/2)
     popMatrix()
 
     # indicate fan status
-    if fan['enabled']:
+    if fan_enabled:
         textFont(fonts['fan_label']['font'])
-        fill(95, 4, 121)
-        text("fan running", fan['x']-1.005*fan['w'], fan['y']+fan['h'])
+        fill(fonts['color'])
+        text("fan running", xpos-1.005*fan_wd, ypos+fan_ht)
 
-def draw():
-    global current_temperature
-    climate_control = None
-    temperature = xpos_to_temperature_value(slider['x'], width)
-    if current_temperature+temperature_padding < temperature:
+def update_climate_control(target_temperature, padding=temperature_padding, step=temperature_step):
+    if climate_control['current_temperature']+padding < target_temperature:
         # increase the current temperature in steps
-        current_temperature += temperature_step
-        bg_color = xpos_to_temperature_color(slider['x'], width)
-        background(bg_color)
-        draw_climate_control_operation("Heating")
-    elif current_temperature-temperature_padding > temperature:
+        climate_control['current_temperature'] += step
+        climate_control['mode'] = "Heating"
+    elif climate_control['current_temperature']-padding > target_temperature:
         # decrease the current temperature in steps
-        current_temperature -= temperature_step
+        climate_control['current_temperature'] -= step
+        climate_control['mode'] = "Cooling"
+    else:
+        climate_control['mode'] = None
+
+def draw_background(mode):
+    if mode == "Heating":
         bg_color = xpos_to_temperature_color(slider['x'], width)
-        background(bg_color)
-        draw_climate_control_operation("Cooling")
+    elif mode == "Cooling":
+        bg_color = xpos_to_temperature_color(slider['x'], width)
     else:
         # default to black when climate is not changing
-        bg_color = color(0, 0, 0)
-        background(bg_color)
-    draw_fan()
-    draw_slider(slider['x'], slider['y'], slider['w'], slider['h'], width)
-    draw_temperature_value(temperature, fonts['slider_temperature']['font'],
-                           width/2, fonts['slider_temperature']['size'])
-    draw_temperature_value(current_temperature, fonts['current_temperature']['font'],
-                           width/4, fonts['slider_temperature']['size']*0.75, "current")
-    # reactive slider
-    if mousePressed and inzone(mouseX, mouseY,
-                               slider['x'], slider['y'],
-                               slider['w'], slider['h']):
-        slider['grab'] = True
-    elif slider['grab'] and not mousePressed:
-        slider['grab'] = False
+        bg_color = black
+    background(bg_color)
 
-    if slider['grab']:
+def update_slider(x, xmax):
+     global slider
+     if slider['grab']:
         #sane limits, keep the slider in the display
-        if 0 <= mouseX <= width:
-            slider['x'] = mouseX
+        if 0 <= x <= xmax:
+            slider['x'] = x
         else:
             print("slider out of bounds, ignoring update.")
 
-    # reactive fan button
-    if mousePressed and inzone(mouseX, mouseY,
-                               fan['x'], fan['y'],
-                               fan['w'], fan['h']):
-        fan['grab'] = True
-    elif fan['grab'] and not mousePressed:
+def mouseReleased():
+    if slider['grab']:
+        slider['grab'] = False
+
+    # toggle fan mode
+    if fan['grab']:
         fan['grab'] = False
-        # toggle fan mode
         fan['enabled'] = not fan['enabled']
+
+def mousePressed():
+    # reactive slider
+    if inzone(mouseX, mouseY, slider['x'], slider['y'], slider['w'], slider['h']):
+        slider['grab'] = True
+
+    # reactive fan button
+    if inzone(mouseX, mouseY, fan['x'], fan['y'], fan['w'], fan['h']):
+        fan['grab'] = True
+
+def draw():
+    target_temperature = xpos_to_temperature_value(slider['x'], width,
+                                                   climate_control['tempRange'][0],
+                                                   climate_control['tempRange'][1])
+    update_climate_control(target_temperature)
+    draw_background(climate_control['mode'])
+    draw_climate_control_mode(climate_control['mode'], width/2, height/4.25)
+    draw_fan(fan['x'], fan['y'], fan['h'], fan['w'], images['propeller'], 0.5, fan['enabled'])
+    update_slider(mouseX, width)
+    draw_slider(slider['x'], slider['y'], slider['w'], slider['h'], width,
+                                                   climate_control['tempRange'][0],
+                                                   climate_control['tempRange'][1])
+    draw_temperature_value(target_temperature, fonts['slider_temperature']['font'],
+                           width/2, fonts['slider_temperature']['size'])
+    draw_temperature_value(climate_control['current_temperature'], 
+                           fonts['current_temperature']['font'],
+                           width/4, fonts['slider_temperature']['size']*0.75, "current")
