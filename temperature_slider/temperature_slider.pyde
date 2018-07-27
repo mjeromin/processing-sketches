@@ -16,6 +16,7 @@ def setup():
     size(640, 640)
     global tempRange
     global slider
+    global fan
     global fonts
     global images
     global use_celsius
@@ -32,12 +33,13 @@ def setup():
 
     fonts = {}
     # Download these font packs and put them in your sketch directory or your ~/.fonts/
-    # https://www.dafont.com/monofur.font
+    # https://www.dafont.com/alien-encounters.font
     # Create the fonts for temperature values
-    fonts['slider_temperature'] = { 'font': createFont("monofur", 85), 'size': 85 }
-    fonts['current_temperature'] = { 'font': createFont("monofur", 20), 'size': 20 }
-    fonts['climate_control'] = { 'font': createFont("monofur", 22), 'size': 22 }
-    fonts['tick_label'] = { 'font': createFont("monofur", 22), 'size': 22 }
+    fonts['slider_temperature'] = { 'font': createFont("Alien Encounters", 85), 'size': 85 }
+    fonts['current_temperature'] = { 'font': createFont("Alien Encounters", 20), 'size': 20 }
+    fonts['climate_control'] = { 'font': createFont("Alien Encounters", 22), 'size': 22 }
+    fonts['tick_label'] = { 'font': createFont("Alien Encounters", 22), 'size': 22 }
+    fonts['fan_label'] = { 'font': createFont("Alien Encounters", 12), 'size': 12 }
 
     images = {}
     # Download GLYPHICONS FREE at http://glyphicons.com/ and install under images/glyphicons_free
@@ -48,6 +50,7 @@ def setup():
     images['glyphicons-695-temperature-high'] = loadImage("../images/glyphicons_free/glyphicons/png/glyphicons-695-temperature-high.png")
     images['glyphicons-696-temperature-low-warn'] = loadImage("../images/glyphicons_free/glyphicons/png/glyphicons-696-temperature-low-warning.png")
     images['glyphicons-697-temperature-high-warn'] = loadImage("../images/glyphicons_free/glyphicons/png/glyphicons-697-temperature-high-warning.png")
+    images['propeller'] = loadImage("../images/propeller.png")
     
     slider = {}
     # initial position is in center of display
@@ -58,6 +61,18 @@ def setup():
     slider['h'] = 50
     # grab tracks whether the user has grabbed the slider
     slider['grab'] = False
+    
+    fan = {}
+    # initial position
+    #fan['x'] = width/5
+    #fan['y'] = height/5
+    fan['x'] = 75
+    fan['y'] = 75
+    # fan size
+    fan['w'] = 36
+    fan['h'] = 34
+    fan['grab'] = False
+    fan['enabled'] = False
 
 def inzone(xpos, ypos, x, y, w, h):
     """Return True if xpos, ypos is inside the x[+/-]w,y[+/-]h zone, else return False. """
@@ -132,6 +147,26 @@ def draw_climate_control_operation(climate_control):
         fill(95, 4, 121)
         text(climate_control, width/2, height/4 - 50)
 
+def draw_fan():
+    """Display the fan, rotate it, and provide a user-friendly indicator."""
+
+    pushMatrix()
+    translate(fan['x'], fan['y'])
+    if fan['enabled']:
+        angle = radians(millis()/2 % 360)
+    else:
+        angle = radians(0)
+    rotate(angle)
+    scale(0.5)
+    image(images['propeller'], -1.0*images['propeller'].width/2, -1.0*images['propeller'].height/2)
+    popMatrix()
+
+    # indicate fan status
+    if fan['enabled']:
+        textFont(fonts['fan_label']['font'])
+        fill(95, 4, 121)
+        text("fan running", fan['x']-1.005*fan['w'], fan['y']+fan['h'])
+
 def draw():
     global current_temperature
     climate_control = None
@@ -152,23 +187,33 @@ def draw():
         # default to black when climate is not changing
         bg_color = color(0, 0, 0)
         background(bg_color)
+    draw_fan()
     draw_slider(slider['x'], slider['y'], slider['w'], slider['h'], width)
     draw_temperature_value(temperature, fonts['slider_temperature']['font'],
                            width/2, fonts['slider_temperature']['size'])
     draw_temperature_value(current_temperature, fonts['current_temperature']['font'],
                            width/4, fonts['slider_temperature']['size']*0.75, "current")
+    # reactive slider
     if mousePressed and inzone(mouseX, mouseY,
                                slider['x'], slider['y'],
                                slider['w'], slider['h']):
         slider['grab'] = True
-    elif not mousePressed:
+    elif slider['grab'] and not mousePressed:
         slider['grab'] = False
+
     if slider['grab']:
         #sane limits, keep the slider in the display
         if 0 <= mouseX <= width:
             slider['x'] = mouseX
-            print("slider set to ({},{}), temperature {}".format(slider['x'],
-                                                                 slider['y'],
-                                                                 temperature))
         else:
             print("slider out of bounds, ignoring update.")
+
+    # reactive fan button
+    if mousePressed and inzone(mouseX, mouseY,
+                               fan['x'], fan['y'],
+                               fan['w'], fan['h']):
+        fan['grab'] = True
+    elif fan['grab'] and not mousePressed:
+        fan['grab'] = False
+        # toggle fan mode
+        fan['enabled'] = not fan['enabled']
