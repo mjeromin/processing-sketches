@@ -5,6 +5,7 @@
 
 # purple-ish look
 font_color = (95, 4, 121)
+font_highlight_color = (222, 13, 177)
 
 # Download this font pack and put it in your sketch directory or your ~/.fonts/
 # https://www.dafont.com/alien-encounters.font
@@ -13,6 +14,8 @@ font_name = "Alien Encounters"
 # Download GLYPHICONS FREE at http://glyphicons.com/ and install under images/glyphicons_free
 # GLYPHICONS FREE are released under the Creative Commons Attribution 3.0 Unported (CC BY 3.0).
 # The Full license can be found here: http://glyphicons.com/license/
+# Note: To apply tint(), glyphicons will need to be inverted from black to white.
+#       With ImageMajick, we can invert using this command: `convert -negate image_black.png image_white.png`
 glyphicons_730_temperature_image = "../images/glyphicons_free/glyphicons/png/glyphicons-730-temperature.png"
 glyphicons_694_temperature_low_image = "../images/glyphicons_free/glyphicons/png/glyphicons-694-temperature-low.png"
 glyphicons_695_temperature_high_image = "../images/glyphicons_free/glyphicons/png/glyphicons-695-temperature-high.png"
@@ -21,6 +24,13 @@ glyphicons_697_temperature_high_warn_image = "../images/glyphicons_free/glyphico
 glyphicons_22_snowflake_image = "../images/glyphicons_free/glyphicons/png/glyphicons-22-snowflake.png"
 glyphicons_23_fire_image = "../images/glyphicons_free/glyphicons/png/glyphicons-23-fire.png"
 propeller_image = "../images/propeller.png"
+glyphicons_74_wifi_image = "../images/glyphicons_free/glyphicons/png/glyphicons-74-wifi.png"
+glyphicons_39_plane_image = "../images/glyphicons_free/glyphicons/png/glyphicons-39-plane.png"
+glyphicons_42_charts_image = "../images/glyphicons_free/glyphicons/png/glyphicons-42-charts.png"
+glyphicons_46_calendar_image = "../images/glyphicons_free/glyphicons/png/glyphicons-46-calendar.png"
+glyphicons_138_cogwheels_image = "../images/glyphicons_free/glyphicons/png/glyphicons-138-cogwheels.png"
+glyphicons_275_beer_image = "../images/glyphicons_free/glyphicons/png/glyphicons-275-beer.png"
+glyphicons_226_bluetooth_image = "../images/glyphicons_free/glyphicons/png/glyphicons-226-bluetooth.png"
 
 # Jython/processing unicode issues force me to avoid degrees symbol
 #celsius = "°C"
@@ -66,6 +76,9 @@ def setup():
 
     fonts = {}
     fonts['color'] = color(font_color[0], font_color[1], font_color[2])
+    fonts['highlight_color'] = color(font_highlight_color[0],
+                                     font_highlight_color[1],
+                                     font_highlight_color[2])
     # Create the fonts for temperature values
     fonts['slider_temperature'] = { 'font': createFont(font_name, 85), 'size': 85 }
     fonts['current_temperature'] = { 'font': createFont(font_name, 20), 'size': 20 }
@@ -85,6 +98,13 @@ def setup():
     images['propeller'] = loadImage(propeller_image)
     images['glyphicons-22-snowflake'] = loadImage(glyphicons_22_snowflake_image)
     images['glyphicons-23-fire'] = loadImage(glyphicons_23_fire_image)
+    images['glyphicons-74-wifi'] = loadImage(glyphicons_74_wifi_image)
+    images['glyphicons-39-plane'] = loadImage(glyphicons_39_plane_image)
+    images['glyphicons-42-charts'] = loadImage(glyphicons_42_charts_image)
+    images['glyphicons-46-calendar'] = loadImage(glyphicons_46_calendar_image)
+    images['glyphicons_138_cogwheels'] = loadImage(glyphicons_138_cogwheels_image)
+    images['glyphicons_275_beer'] = loadImage(glyphicons_275_beer_image)
+    images['glyphicons_226_bluetooth'] = loadImage(glyphicons_226_bluetooth_image) 
     
     slider = {}
     # initial position is in center of display
@@ -145,6 +165,7 @@ def draw_slider(xpos, ypos, slider_ht, slider_wd, xmax, tmin, tmax):
     ellipse(xpos, ypos, slider_wd, slider_ht)
 
     # Select the appropriate glyphicon depending on slider position
+    tint(black)
     if 1.0*xpos/xmax < 0.1:
         image(images['glyphicons-696-temperature-low-warn'], xpos-slider_wd/10, ypos-slider_ht/4)
     elif 1.0*xpos/xmax < 0.4:
@@ -155,6 +176,7 @@ def draw_slider(xpos, ypos, slider_ht, slider_wd, xmax, tmin, tmax):
         image(images['glyphicons-695-temperature-high'], xpos-slider_wd/10, ypos-slider_ht/4)
     else:
         image(images['glyphicons-697-temperature-high-warn'], xpos-slider_wd/10, ypos-slider_ht/4)
+    noTint()
 
 def draw_temperature_value(value, font, xpos, ypos, label=None):
     """Draw temperature value param."""
@@ -178,7 +200,9 @@ def draw_climate_control_mode(mode, xpos, ypos):
             pushMatrix()
             translate(x, y)
             scale(icon_scale)
+            tint(95, 4, 121)
             image(icon_image, 0, 0)
+            noTint()
             popMatrix()
 
     if mode == "Heating" or mode == "Cooling":
@@ -201,7 +225,9 @@ def draw_fan(xpos, ypos, fan_ht, fan_wd, fan_img, fan_img_scale, fan_enabled):
         angle = radians(0)
     rotate(angle)
     scale(fan_img_scale)
+    tint(fonts['color'])
     image(fan_img, -1.0*fan_img.width/2, -1.0*fan_img.height/2)
+    noTint()
     popMatrix()
 
     # indicate fan status
@@ -209,6 +235,34 @@ def draw_fan(xpos, ypos, fan_ht, fan_wd, fan_img, fan_img_scale, fan_enabled):
         textFont(fonts['fan_label']['font'])
         fill(fonts['color'])
         text("fan running", xpos-1.005*fan_wd, ypos+fan_ht)
+
+def draw_status_item(xpos, ypos, img, img_scale=1.0, enabled=False):
+    """Display the status indicator."""
+
+    if enabled:
+        pushMatrix()
+        translate(xpos, ypos)
+        scale(img_scale)
+        tint(fonts['color'])
+        image(img, -1.0*img.width/2, -1.0*img.height/2)
+        noTint()
+        popMatrix()
+
+def draw_menu_item(xpos, ypos, img, img_scale=1.0, highlight=False):
+    """Display the menu item."""
+
+    if highlight:
+        tint_color = fonts['highlight_color']
+    else:
+        tint_color = fonts['color']
+
+    pushMatrix()
+    translate(xpos, ypos)
+    scale(img_scale)
+    tint(tint_color)
+    image(img, -1.0*img.width/2, -1.0*img.height/2)
+    noTint()
+    popMatrix()
 
 def update_climate_control(target_temperature, padding=temperature_padding, step=temperature_step):
     if climate_control['current_temperature']+padding < target_temperature:
@@ -276,3 +330,36 @@ def draw():
     draw_temperature_value(climate_control['current_temperature'], 
                            fonts['current_temperature']['font'],
                            width/4, fonts['slider_temperature']['size']*0.75, "current")
+
+    draw_status_item(0.9*width, 0.07*height, images['glyphicons-74-wifi'], 0.5, True)
+    draw_status_item(0.9*width, 0.11*height, images['glyphicons_226_bluetooth'], 0.5, True)
+
+    # draw settings menu item
+    if inzone(mouseX, mouseY, 0.05*width, 0.65*height, 20, 20):
+        draw_menu_item(0.05*width, 0.65*height, images['glyphicons_138_cogwheels'], 1.0, True)
+    else:
+        draw_menu_item(0.05*width, 0.65*height, images['glyphicons_138_cogwheels'], 1.0)
+
+    # draw calendar menu item
+    if inzone(mouseX, mouseY, 0.15*width, 0.65*height, 20, 20):
+        draw_menu_item(0.15*width, 0.65*height, images['glyphicons-46-calendar'], 1.0, True)
+    else:
+        draw_menu_item(0.15*width, 0.65*height, images['glyphicons-46-calendar'], 1.0)
+
+    # draw charts menu item
+    if inzone(mouseX, mouseY, 0.25*width, 0.65*height, 20, 20):
+        draw_menu_item(0.25*width, 0.65*height, images['glyphicons-42-charts'], 1.0, True)
+    else:
+        draw_menu_item(0.25*width, 0.65*height, images['glyphicons-42-charts'], 1.0)
+
+    # draw vacation mode menu item
+    if inzone(mouseX, mouseY, 0.35*width, 0.65*height, 20, 20):
+        draw_menu_item(0.35*width, 0.65*height, images['glyphicons-39-plane'], 1.0, True)
+    else:
+        draw_menu_item(0.35*width, 0.65*height, images['glyphicons-39-plane'], 1.0)
+
+    # draw beer mode menu item
+    if inzone(mouseX, mouseY, 0.45*width, 0.65*height, 20, 20):
+        draw_menu_item(0.45*width, 0.65*height, images['glyphicons_275_beer'], 1.0, True)
+    else:
+        draw_menu_item(0.45*width, 0.65*height, images['glyphicons_275_beer'], 1.0)
