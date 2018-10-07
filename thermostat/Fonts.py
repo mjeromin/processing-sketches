@@ -14,10 +14,9 @@ class Fonts(object):
     """Store a dictionary of fonts."""
 
     def __init__(self, d=None):
-        d = {}
-        d['target_temperature'] = Font({ 'font': createFont(font_name, 85), 'size': 85 })
-        d['current_temperature'] = Font({ 'font': createFont(font_name, 20), 'size': 20 })
-        d['climate_control'] = Font({ 'font': createFont(font_name, 22), 'size': 22 })
-        d['tick_label'] = Font({ 'font': createFont(font_name, 22), 'size': 22 })
-        d['fan_label'] = Font({ 'font': createFont(font_name, 12), 'size': 12 })
-        self.__dict__ = d
+        self.__dict__ = {            'setpoint': Font({ 'font': createFont(font_name, 85), 'size': 85 }),
+                          'current_temperature': Font({ 'font': createFont(font_name, 20), 'size': 20 }),
+                              'climate_control': Font({ 'font': createFont(font_name, 22), 'size': 22 }),
+                                   'tick_label': Font({ 'font': createFont(font_name, 22), 'size': 22 }),
+                                    'fan_label': Font({ 'font': createFont(font_name, 12), 'size': 12 })
+                        }

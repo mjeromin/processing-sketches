@@ -14,20 +14,20 @@ class Glyphicons(object):
     """Store a dictionary of glyphicons."""
 
     def __init__(self):
-        d = {}
-        d['temperature'] = loadImage("../images/glyphicons_free/glyphicons/png/glyphicons-730-temperature.png")
-        d['temperature_low'] = loadImage("../images/glyphicons_free/glyphicons/png/glyphicons-694-temperature-low.png")
-        d['temperature_high'] = loadImage("../images/glyphicons_free/glyphicons/png/glyphicons-695-temperature-high.png")
-        d['temperature_low_warn'] = loadImage("../images/glyphicons_free/glyphicons/png/glyphicons-696-temperature-low-warning.png")
-        d['temperature_high_warn'] = loadImage("../images/glyphicons_free/glyphicons/png/glyphicons-697-temperature-high-warning.png")
-        d['snowflake'] = loadImage("../images/glyphicons_free/glyphicons/png/glyphicons-22-snowflake.png")
-        d['fire'] = loadImage("../images/glyphicons_free/glyphicons/png/glyphicons-23-fire.png")
-        d['wifi'] = loadImage("../images/glyphicons_free/glyphicons/png/glyphicons-74-wifi.png")
-        d['plane'] = loadImage("../images/glyphicons_free/glyphicons/png/glyphicons-39-plane.png")
-        d['charts'] = loadImage("../images/glyphicons_free/glyphicons/png/glyphicons-42-charts.png")
-        d['calendar'] = loadImage("../images/glyphicons_free/glyphicons/png/glyphicons-46-calendar.png")
-        d['cogwheels'] = loadImage("../images/glyphicons_free/glyphicons/png/glyphicons-138-cogwheels.png")
-        d['beer'] = loadImage("../images/glyphicons_free/glyphicons/png/glyphicons-275-beer.png")
-        d['bluetooth'] = loadImage("../images/glyphicons_free/glyphicons/png/glyphicons-226-bluetooth.png")
-        d['propeller'] = loadImage("../images/propeller.png")
-        self.__dict__ = d
+        self.__dict__ = {
+                                   'temperature': loadImage("../images/glyphicons_free/glyphicons/png/glyphicons-730-temperature.png"),
+                               'temperature_low': loadImage("../images/glyphicons_free/glyphicons/png/glyphicons-694-temperature-low.png"),
+                              'temperature_high': loadImage("../images/glyphicons_free/glyphicons/png/glyphicons-695-temperature-high.png"),
+                          'temperature_low_warn': loadImage("../images/glyphicons_free/glyphicons/png/glyphicons-696-temperature-low-warning.png"),
+                         'temperature_high_warn': loadImage("../images/glyphicons_free/glyphicons/png/glyphicons-697-temperature-high-warning.png"),
+                                     'snowflake': loadImage("../images/glyphicons_free/glyphicons/png/glyphicons-22-snowflake.png"),
+                                          'fire': loadImage("../images/glyphicons_free/glyphicons/png/glyphicons-23-fire.png"),
+                                          'wifi': loadImage("../images/glyphicons_free/glyphicons/png/glyphicons-74-wifi.png"),
+                                         'plane': loadImage("../images/glyphicons_free/glyphicons/png/glyphicons-39-plane.png"),
+                                        'charts': loadImage("../images/glyphicons_free/glyphicons/png/glyphicons-42-charts.png"),
+                                      'calendar': loadImage("../images/glyphicons_free/glyphicons/png/glyphicons-46-calendar.png"),
+                                     'cogwheels': loadImage("../images/glyphicons_free/glyphicons/png/glyphicons-138-cogwheels.png"),
+                                          'beer': loadImage("../images/glyphicons_free/glyphicons/png/glyphicons-275-beer.png"),
+                                     'bluetooth': loadImage("../images/glyphicons_free/glyphicons/png/glyphicons-226-bluetooth.png"),
+                                     'propeller': loadImage("../images/propeller.png")
+                        }
