@@ -242,52 +242,35 @@ class ControlPanel():
             # todo: fix hardcoded offset 
             text("fan running", xpos-1.005*width, ypos+height)
 
-    def draw_wifi_indicator(self, xpos, ypos, scale):
+    def draw_wifi_indicator(self, xpos, ypos, scale, enabled=True):
         """Draw wifi indicator. """
+        draw_status_item(xpos, ypos, self.glyphs.wifi, self.font_color, scale, enabled=True)
 
-        # todo: wifi indicator status flag
-        enabled = True 
-        draw_status_item(xpos, ypos, self.glyphs.wifi, self.font_color, scale, enabled)
-
-    def draw_bluetooth_indicator(self, xpos, ypos, scale):
+    def draw_bluetooth_indicator(self, xpos, ypos, scale, enable=True):
         """Draw bluetooth indicator. """
-
-        # todo: bluetooth indicator status flag
-        enabled = True
-        draw_status_item(xpos, ypos, self.glyphs.bluetooth, self.font_color, scale, True)
+        draw_status_item(xpos, ypos, self.glyphs.bluetooth, self.font_color, scale, enabled=True)
 
     def draw_menu(self, mouseX, mouseY, scale=1.0):
         """Draw the control panel menu. """
 
-        # draw settings menu item
-        if is_inside(mouseX, mouseY, 0.05*self.width, 0.65*self.height, 20, 20):
-            draw_menu_item(0.05*self.width, 0.65*self.height, self.glyphs.cogwheels, self.font_highlight_color, scale)
-        else:
-            draw_menu_item(0.05*self.width, 0.65*self.height, self.glyphs.cogwheels, self.font_color, scale)
-
-        # draw calendar menu item
-        if is_inside(mouseX, mouseY, 0.15*self.width, 0.65*self.height, 20, 20):
-            draw_menu_item(0.15*self.width, 0.65*self.height, self.glyphs.calendar, self.font_highlight_color, scale)
-        else:
-            draw_menu_item(0.15*self.width, 0.65*self.height, self.glyphs.calendar, self.font_color, scale)
-
-        # draw charts menu item
-        if is_inside(mouseX, mouseY, 0.25*self.width, 0.65*self.height, 20, 20):
-            draw_menu_item(0.25*self.width, 0.65*self.height, self.glyphs.charts, self.font_highlight_color, scale)
-        else:
-            draw_menu_item(0.25*self.width, 0.65*self.height, self.glyphs.charts, self.font_color, scale)
-
-        # draw vacation mode menu item
-        if is_inside(mouseX, mouseY, 0.35*self.width, 0.65*self.height, 20, 20):
-            draw_menu_item(0.35*self.width, 0.65*self.height, self.glyphs.plane, self.font_highlight_color, scale)
-        else:
-            draw_menu_item(0.35*self.width, 0.65*self.height, self.glyphs.plane, self.font_color, scale)
-
-        # draw beer mode menu item
-        if is_inside(mouseX, mouseY, 0.45*self.width, 0.65*self.height, 20, 20):
-            draw_menu_item(0.45*self.width, 0.65*self.height, self.glyphs.beer, self.font_highlight_color, scale)
-        else:
-            draw_menu_item(0.45*self.width, 0.65*self.height, self.glyphs.beer, self.font_color, scale)
+        items = [self.glyphs.cogwheels,
+                 self.glyphs.calendar,
+                 self.glyphs.charts,
+                 self.glyphs.plane,
+                 self.glyphs.beer
+                ]
+        wfactor = 0.05
+        xpos = wfactor*self.width
+        ypos = 0.65*self.height
+        xvar = 20
+        yvar = 20
+        for item in items:
+            if is_inside(mouseX, mouseY, xpos, ypos, xvar, yvar):
+                draw_menu_item(xpos, ypos, item, self.font_highlight_color, scale)
+            else:
+                draw_menu_item(xpos, ypos, item, self.font_color, scale)
+            wfactor+=0.1
+            xpos = wfactor*self.width
 
     def draw_main(self, mouseX, mouseY):
         """The main draw loop. """

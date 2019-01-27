@@ -1,5 +1,5 @@
 """
- * A class for our fonts dictionary, for use with Processing in Python mode
+ * A class for our fonts, for use with Processing in Python mode
 """
 
 # Download this font pack and put it in your sketch directory or your ~/.fonts/

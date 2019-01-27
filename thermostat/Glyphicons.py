@@ -1,7 +1,6 @@
 """
- * A class for our images dictionary, for use with Processing in Python mode
- * Download GLYPHICONS FREE at http://glyphicons.com/ and install under
- * ../images/glyphicons_free
+ * A class for our images. Download GLYPHICONS FREE at http://glyphicons.com/,
+ * install under ../images/glyphicons_free
  *
  * GLYPHICONS FREE are released under the Creative Commons Attribution 3.0 Unported (CC BY 3.0).
  * The Full license can be found here: http://glyphicons.com/license/
