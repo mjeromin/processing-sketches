@@ -28,5 +28,6 @@ class Glyphicons(object):
                                      'cogwheels': loadImage("../images/glyphicons_free/glyphicons/png/glyphicons-138-cogwheels.png"),
                                           'beer': loadImage("../images/glyphicons_free/glyphicons/png/glyphicons-275-beer.png"),
                                      'bluetooth': loadImage("../images/glyphicons_free/glyphicons/png/glyphicons-226-bluetooth.png"),
+                                          'home': loadImage("../images/glyphicons_free/glyphicons/png/glyphicons-21-home.png"),
                                      'propeller': loadImage("../images/propeller.png")
                         }

@@ -18,5 +18,6 @@ class Fonts(object):
                           'current_temperature': Font({ 'font': createFont(font_name, 20), 'size': 20 }),
                               'climate_control': Font({ 'font': createFont(font_name, 22), 'size': 22 }),
                                    'tick_label': Font({ 'font': createFont(font_name, 22), 'size': 22 }),
-                                    'fan_label': Font({ 'font': createFont(font_name, 12), 'size': 12 })
+                                    'fan_label': Font({ 'font': createFont(font_name, 12), 'size': 12 }),
+                            'example_functions': Font({ 'font': createFont(font_name, 20), 'size': 20 })
                         }

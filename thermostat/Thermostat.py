@@ -54,6 +54,12 @@ class ControlPanel():
         # Initiate our fan control (disabled at startup)
         self.fan = Widget(fan_xpos, fan_ypos, fan_wd, fan_ht, False, False)
 
+        # Intial function 
+        self.function = 'main'
+        
+        # Initialize grab
+        self.grab = False
+
     def update_climate(self, setpoint):
         """Step the current temperature towards the target temperature +/- padding. Mode indicates which direction we are stepping."""
 
@@ -104,6 +110,9 @@ class ControlPanel():
     def mouse_released(self):
         """Function for when mouse button is released. """
 
+        if self.grab:
+            self.grab = False
+
         if self.slider.grab:
             self.slider.grab = False
     
@@ -116,12 +125,17 @@ class ControlPanel():
         """Function for when mouse button is pressed. """
 
         # reactive slider
-        if is_inside(mouseX, mouseY, self.slider.x, self.slider.y, self.slider.wd, self.slider.ht):
+        if is_inside(mouseX, mouseY, self.slider.x, self.slider.y, self.slider.wd, self.slider.ht) and self.function == 'main':
             self.slider.grab = True
     
         # reactive fan button
-        if is_inside(mouseX, mouseY, self.fan.x, self.fan.y, self.fan.wd, self.fan.ht):
+        elif is_inside(mouseX, mouseY, self.fan.x, self.fan.y, self.fan.wd, self.fan.ht) and self.function == 'main':
             self.fan.grab = True
+
+        # It's important to limit what gets grabbed first so we don't trigger other functions
+        # while the mouse is moving+pressed
+        else:
+            self.grab = True
 
     def draw_slider(self):
         """Draw the slider widget. """
@@ -188,7 +202,7 @@ class ControlPanel():
             text("{} {}".format(int(value), fahrenheit), xpos, ypos)
 
     def draw_climate_control_mode(self, xpos, ypos):
-        """Display the climate control mode if it is being performed"""
+        """Display the climate control mode if this mode is set."""
     
         def draw_icon(icon_image, icon_scale, x, y):
                 pushMatrix()
@@ -221,7 +235,7 @@ class ControlPanel():
         width = self.fan.wd
         fan_img = self.glyphs.propeller
 
-        # Animate a spinning fan
+        # Animate a spinning fan using millis() and frameRate(60) as our driver
         pushMatrix()
         translate(xpos, ypos)
         if self.fan.enabled:
@@ -250,15 +264,9 @@ class ControlPanel():
         """Draw bluetooth indicator. """
         draw_status_item(xpos, ypos, self.glyphs.bluetooth, self.font_color, scale, enabled=True)
 
-    def draw_menu(self, mouseX, mouseY, scale=1.0):
-        """Draw the control panel menu. """
+    def draw_navbar(self, mouseX, mouseY, items, scale=1.0):
+        """Draw the control panel menu items. """
 
-        items = [self.glyphs.cogwheels,
-                 self.glyphs.calendar,
-                 self.glyphs.charts,
-                 self.glyphs.plane,
-                 self.glyphs.beer
-                ]
         wfactor = 0.05
         xpos = wfactor*self.width
         ypos = 0.65*self.height
@@ -266,25 +274,68 @@ class ControlPanel():
         yvar = 20
         for item in items:
             if is_inside(mouseX, mouseY, xpos, ypos, xvar, yvar):
-                draw_menu_item(xpos, ypos, item, self.font_highlight_color, scale)
+                draw_menu_item(xpos, ypos, item[0], self.font_highlight_color, scale)
+                if self.grab:
+                    self.function = item[1]
             else:
-                draw_menu_item(xpos, ypos, item, self.font_color, scale)
+                draw_menu_item(xpos, ypos, item[0], self.font_color, scale)
             wfactor+=0.1
             xpos = wfactor*self.width
+
+    def draw_example_function(self, mouseX, mouseY, title, img, scale=1.0):
+        """Draw screen for example function."""
+
+        textFont(self.fonts.example_functions.font)
+        fill(self.font_color)
+        text("Example Function: {}".format(title), self.width/4.0, self.height/2.0-20)
+        draw_menu_item(self.width/2.0, self.height/2.0, img, self.font_color, scale)
+
+        # We need a way to return home
+        if is_inside(mouseX, mouseY, self.width/9.0, self.height/9.0, 20, 20):
+            draw_menu_item(self.width/9.0, self.height/9.0, self.glyphs.home, self.font_highlight_color, scale)
+            if self.grab:
+                self.function = 'main'
+        else:
+            draw_menu_item(self.width/9.0, self.height/9.0, self.glyphs.home, self.font_color, scale)
 
     def draw_main(self, mouseX, mouseY):
         """The main draw loop. """
 
+
+        # The functions that are displayed in our nav bar
+        nav_items = [(self.glyphs.cogwheels, 'settings'),
+                      (self.glyphs.calendar, 'calendar'),
+                      (self.glyphs.charts, 'metrics'),
+                      (self.glyphs.plane, 'vacation'),
+                      (self.glyphs.beer, 'beer'),
+                     ]
+
+        # keep updating the current temperature
         setpoint = self.xpos_to_temperature_value(self.slider.x, self.width, self.slider_temp_min, self.slider_temp_max)
         self.update_climate(setpoint)
+
+        # All functions share the same background
         self.draw_background()
-        self.draw_climate_control_mode(self.width/2, self.height/4.25)
-        self.draw_fan(0.5)
-        self.update_slider(mouseX)
-        self.draw_slider()
-        self.draw_temperature_value(setpoint, self.fonts.setpoint.font, self.width/2, self.fonts.setpoint.size)
-        self.draw_temperature_value(self.current_temperature, self.fonts.current_temperature.font, self.width/4, self.fonts.setpoint.size*0.75, "current")
-        self.draw_wifi_indicator(0.9*self.width, 0.07*self.height, 0.5)
-        self.draw_bluetooth_indicator(0.9*self.width, 0.11*self.height, 0.5)
-        self.draw_menu(mouseX, mouseY)
+
+        if self.function == 'settings':
+            self.draw_example_function(mouseX, mouseY, "Settings Mode", self.glyphs.cogwheels)
+        elif self.function == 'calendar':
+            self.draw_example_function(mouseX, mouseY, "Calendar Mode", self.glyphs.calendar)
+        elif self.function == 'metrics':
+            self.draw_example_function(mouseX, mouseY, "Metrics Mode", self.glyphs.charts)
+        elif self.function == 'vacation':
+            self.draw_example_function(mouseX, mouseY, "Vacation Mode", self.glyphs.plane)
+        elif self.function == 'beer':
+            self.draw_example_function(mouseX, mouseY, "Beer Mode", self.glyphs.beer)
+        else:
+            self.draw_climate_control_mode(self.width/2, self.height/4.25)
+            self.draw_fan(0.5)
+            self.update_slider(mouseX)
+            self.draw_slider()
+            self.draw_temperature_value(setpoint, self.fonts.setpoint.font, self.width/2, self.fonts.setpoint.size)
+            self.draw_temperature_value(self.current_temperature, self.fonts.current_temperature.font, self.width/4, self.fonts.setpoint.size*0.75, "current")
+            self.draw_wifi_indicator(0.9*self.width, 0.07*self.height, 0.5)
+            self.draw_bluetooth_indicator(0.9*self.width, 0.11*self.height, 0.5)
+            self.draw_navbar(mouseX, mouseY, nav_items)
+
 
