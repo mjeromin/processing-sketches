@@ -14,6 +14,12 @@ moon_speed_x = 0.3
 moon_speed_y = 0.0
 moon_diameter = 55
 
+max_cloud_length=120
+max_cloud_height=35
+min_puff_count=60
+max_puff_count=95
+max_puff_diameter=35
+
 def setup():
     size(1024, 444, P3D)
     frameRate(60)

@@ -9,3 +9,7 @@ modes/
 tools/
 examples/
 scraps/
+images/glyphicons_free
+processing-py.jar
+*.class
+libraries/
